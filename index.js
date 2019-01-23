@@ -1,17 +1,15 @@
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import {
-  StyleSheet,
-  Platform,
   Animated,
-  Text,
-  View,
   Dimensions,
+  Platform,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
 
-const {
-  height: SCREEN_HEIGHT,
-} = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? (IS_IPHONE_X ? 44 : 20) : 0;
@@ -23,25 +21,25 @@ const DEFAULT_HEADER_MIN_HEIGHT = NAV_BAR_HEIGHT;
 const DEFAULT_EXTRA_SCROLL_HEIGHT = 50;
 const DEFAULT_BACKGROUND_IMAGE_SCALE = 1.5;
 
-const DEFAULT_NAVBAR_COLOR = '#3498db';
-const DEFAULT_BACKGROUND_COLOR = '#303F9F';
+const DEFAULT_NAVBAR_COLOR = 'transparent'; //'#3498db';
+const DEFAULT_BACKGROUND_COLOR = 'transparent';
 const DEFAULT_TITLE_COLOR = 'white';
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    flex: 1,
+    flex: 1
   },
   scrollView: {
-    flex: 1,
+    flex: 1
   },
   header: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: DEFAULT_NAVBAR_COLOR,
-    overflow: 'hidden',
+    // backgroundColor: DEFAULT_NAVBAR_COLOR,
+    overflow: 'hidden'
   },
   backgroundImage: {
     position: 'absolute',
@@ -50,7 +48,7 @@ const styles = StyleSheet.create({
     right: 0,
     width: null,
     height: DEFAULT_HEADER_MAX_HEIGHT,
-    resizeMode: 'cover',
+    resizeMode: 'cover'
   },
   bar: {
     backgroundColor: 'transparent',
@@ -58,7 +56,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    right: 0,
+    right: 0
   },
   headerTitle: {
     backgroundColor: 'transparent',
@@ -67,21 +65,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingTop: STATUS_BAR_HEIGHT,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: '100%',
+    // alignItems: 'flex-end',
+    justifyContent: 'flex-end'
   },
   headerText: {
     color: DEFAULT_TITLE_COLOR,
     textAlign: 'center',
-    fontSize: 16,
-  },
+    fontSize: 16
+  }
 });
 
 class RNParallax extends Component {
   constructor() {
     super();
     this.state = {
-      scrollY: new Animated.Value(0),
+      scrollY: new Animated.Value(0)
     };
   }
 
@@ -116,8 +115,12 @@ class RNParallax extends Component {
   getHeaderHeight() {
     return this.state.scrollY.interpolate({
       inputRange: this.getInputRange(),
-      outputRange: [this.getHeaderMaxHeight() + this.getExtraScrollHeight(), this.getHeaderMaxHeight(), this.getHeaderMinHeight()],
-      extrapolate: 'clamp',
+      outputRange: [
+        this.getHeaderMaxHeight() + this.getExtraScrollHeight(),
+        this.getHeaderMaxHeight(),
+        this.getHeaderMinHeight()
+      ],
+      extrapolate: 'clamp'
     });
   }
 
@@ -125,7 +128,7 @@ class RNParallax extends Component {
     return this.state.scrollY.interpolate({
       inputRange: this.getInputRange(),
       outputRange: [0, 1, 1],
-      extrapolate: 'clamp',
+      extrapolate: 'clamp'
     });
   }
 
@@ -133,7 +136,7 @@ class RNParallax extends Component {
     return this.state.scrollY.interpolate({
       inputRange: this.getInputRange(),
       outputRange: [1, 1, 0],
-      extrapolate: 'clamp',
+      extrapolate: 'clamp'
     });
   }
 
@@ -141,7 +144,7 @@ class RNParallax extends Component {
     return this.state.scrollY.interpolate({
       inputRange: this.getInputRange(),
       outputRange: [0, 0, -50],
-      extrapolate: 'clamp',
+      extrapolate: 'clamp'
     });
   }
 
@@ -149,7 +152,7 @@ class RNParallax extends Component {
     return this.state.scrollY.interpolate({
       inputRange: this.getInputRange(),
       outputRange: [this.getBackgroundImageScale(), 1, 1],
-      extrapolate: 'clamp',
+      extrapolate: 'clamp'
     });
   }
 
@@ -157,29 +160,43 @@ class RNParallax extends Component {
     return this.state.scrollY.interpolate({
       inputRange: this.getInputRange(),
       outputRange: [5, 0, 0],
-      extrapolate: 'clamp',
+      extrapolate: 'clamp'
     });
   }
 
   renderHeaderTitle() {
-    const { title, titleStyle } = this.props;
+    const { title, titleStyle, renderHeaderTitle } = this.props;
     const titleTranslate = this.getTitleTranslate();
+    if (typeof renderHeaderTitle === 'function') {
+      return (
+        <Animated.View
+          style={[
+            styles.headerTitle,
+            {
+              transform: [{ translateY: titleTranslate }],
+              height: this.getHeaderHeight()
+            }
+          ]}
+        >
+          {renderHeaderTitle()}
+        </Animated.View>
+      );
+    }
 
     return (
       <Animated.View
         style={[
           styles.headerTitle,
           {
-            transform: [
-              { translateY: titleTranslate },
-            ],
-            height: this.getHeaderHeight(),
-          },
+            transform: [{ translateY: titleTranslate }],
+            height: this.getHeaderHeight()
+          }
         ]}
       >
-        <Text style={[styles.headerText, titleStyle]}>
-          {title}
-        </Text>
+        <View style={{ backgroundColor: 'red' }}>
+          <Text style={[styles.headerText, titleStyle]}>{title}</Text>
+          <Text style={[styles.headerText, titleStyle]}>{'title 2'}</Text>
+        </View>
       </Animated.View>
     );
   }
@@ -192,8 +209,8 @@ class RNParallax extends Component {
         style={[
           styles.bar,
           {
-            height: this.getHeaderMinHeight(),
-          },
+            height: this.getHeaderMinHeight()
+          }
         ]}
       >
         {renderNavBar()}
@@ -214,8 +231,8 @@ class RNParallax extends Component {
           {
             height: this.getHeaderMaxHeight(),
             opacity: imageOpacity,
-            transform: [{ translateY: imageTranslate }, { scale: imageScale }],
-          },
+            transform: [{ translateY: imageTranslate }, { scale: imageScale }]
+          }
         ]}
         source={backgroundImage}
       />
@@ -235,7 +252,7 @@ class RNParallax extends Component {
           height: this.getHeaderMaxHeight(),
           backgroundColor,
           opacity: imageOpacity,
-          transform: [{ translateY: imageTranslate }, { scale: imageScale }],
+          transform: [{ translateY: imageTranslate }, { scale: imageScale }]
         }}
       />
     );
@@ -252,8 +269,8 @@ class RNParallax extends Component {
           {
             height: this.getHeaderHeight(),
             backgroundColor: navbarColor,
-            opacity: navBarOpacity,
-          },
+            opacity: navBarOpacity
+          }
         ]}
       />
     );
@@ -270,8 +287,8 @@ class RNParallax extends Component {
           {
             height: this.getHeaderHeight(),
             opacity: imageOpacity,
-            backgroundColor: backgroundImage ? 'transparent' : backgroundColor,
-          },
+            backgroundColor: backgroundImage ? 'transparent' : backgroundColor
+          }
         ]}
       >
         {backgroundImage && this.renderBackgroundImage()}
@@ -281,18 +298,25 @@ class RNParallax extends Component {
   }
 
   renderScrollView() {
-    const { renderContent, scrollEventThrottle, contentContainerStyle, containerStyle } = this.props;
+    const {
+      renderContent,
+      scrollEventThrottle,
+      contentContainerStyle,
+      containerStyle
+    } = this.props;
 
     return (
       <Animated.ScrollView
         style={styles.scrollView}
         scrollEventThrottle={scrollEventThrottle}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
-        )}
+        onScroll={Animated.event([
+          { nativeEvent: { contentOffset: { y: this.state.scrollY } } }
+        ])}
         contentContainerStyle={contentContainerStyle}
       >
-        <View style={[{ marginTop: this.getHeaderMaxHeight() }, containerStyle]}>
+        <View
+          style={[{ marginTop: this.getHeaderMaxHeight() }, containerStyle]}
+        >
           {renderContent()}
         </View>
       </Animated.ScrollView>
@@ -305,8 +329,8 @@ class RNParallax extends Component {
         {this.renderScrollView()}
         {this.renderNavbarBackground()}
         {this.renderHeaderBackground()}
-        {this.renderHeaderTitle()}
         {this.renderHeaderForeground()}
+        {this.renderHeaderTitle()}
       </View>
     );
   }
@@ -318,7 +342,7 @@ RNParallax.propTypes = {
   backgroundColor: PropTypes.string,
   backgroundImage: PropTypes.any,
   navbarColor: PropTypes.string,
-  title: PropTypes.string,
+  title: PropTypes.any,
   titleStyle: PropTypes.any,
   headerMaxHeight: PropTypes.number,
   headerMinHeight: PropTypes.number,
@@ -326,7 +350,7 @@ RNParallax.propTypes = {
   extraScrollHeight: PropTypes.number,
   backgroundImageScale: PropTypes.number,
   contentContainerStyle: PropTypes.any,
-  containerStyle: PropTypes.any,
+  containerStyle: PropTypes.any
 };
 
 RNParallax.defaultProps = {
@@ -342,7 +366,7 @@ RNParallax.defaultProps = {
   extraScrollHeight: DEFAULT_EXTRA_SCROLL_HEIGHT,
   backgroundImageScale: DEFAULT_BACKGROUND_IMAGE_SCALE,
   contentContainerStyle: null,
-  containerStyle: null,
+  containerStyle: null
 };
 
 export default RNParallax;
